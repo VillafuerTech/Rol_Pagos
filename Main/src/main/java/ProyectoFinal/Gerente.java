@@ -1,15 +1,28 @@
 package ProyectoFinal;
-
 import java.util.Comparator;
 
-    public class Gerente extends Empleado {
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlAccessType;
+
+@XmlRootElement(name = "Gerente")
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(propOrder = {"titulo", "comision"})
+public class Gerente extends Empleado {
         private String titulo;
         private float comision;
 
+        public Gerente(String nombre, String apellido, int codigo, String fechaContratacion, float sueldo) {
+            super(nombre, apellido, codigo, fechaContratacion, sueldo);
+        }
         public Gerente(String nombre, String apellido, int codigo, String fechaContratacion, float sueldo, String titulo, float comision) {
             super (nombre, apellido, codigo, fechaContratacion, sueldo);
             setTitulo(titulo);
             setComision(comision);
+        }
+        public Gerente() {
+            super();
         }
 
         public String getTitulo() {
@@ -28,7 +41,7 @@ import java.util.Comparator;
             return comision;
         }
 
-        public void setComision(float comision) {
+        private void setComision(float comision) {
             //No puede ser negativo
             if (comision < 0) {
                 throw new IllegalArgumentException("La comision no puede ser negativa");
@@ -54,20 +67,11 @@ import java.util.Comparator;
             float sueldoYBonificacion2 = (float) (empleado.getSueldo() + ((Gerente) empleado).getComision());
             return Float.compare(sueldoYBonificacion1, sueldoYBonificacion2);
         }
+      
         @Override
-        public String toCSV(){
-            return super.toCSV() + "," + titulo + "," + comision;
-        }
-        @Override
-        public float CalcularSueldoMensual() {
-        float sueldoMensual = getSueldo();
-        float aporteIESS = (float) (sueldoMensual * 0.0945);
-        float fondoReserva = 0; // Declare and assign the variable
-        if (Empleado.haPasadoUnAño(getFechaContratacion())) { // Add missing opening curly brace
-            fondoReserva = (float) (sueldoMensual * 0.0833);
-        }
-        float decimoTercero = (float) (sueldoMensual / 12);
-        float decimoCuarto = (float) (sueldoMensual / 12);
-        return sueldoMensual - aporteIESS - fondoReserva - decimoTercero - decimoCuarto + comision;
+        public float sueldoLiquido() {
+        float sueldoMensual = CalcularSueldoMensual();
+        float sueldoLiquido = sueldoMensual + comision/12 - impuestoRenta();
+        return sueldoLiquido;
     }
     }

@@ -2,14 +2,23 @@ package ProyectoFinal;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Objects;
+
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlType;
+
+
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import javax.xml.bind.annotation.XmlAccessType;
 
-import javax.xml.bind.annotation.*;
-@XmlRootElement(name="Empleado")
+@XmlRootElement(name = "Empleado")
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {"nombre", "apellido", "codigo", "fechaContratacion", "sueldo"})
+@XmlSeeAlso({Gerente.class}) 
 
 public class Empleado implements Comparable<Empleado>, Comparator<Empleado>, Serializable {
     private String nombre;
@@ -106,7 +115,7 @@ public class Empleado implements Comparable<Empleado>, Comparator<Empleado>, Ser
                 ", codigo=" + codigo +
                 ", fechaContratacion='" + fechaContratacion + '\'' +
                 ", sueldo=" + sueldo +
-                '}';
+                '}'+"\n";
     }
 
     
@@ -161,9 +170,6 @@ public class Empleado implements Comparable<Empleado>, Comparator<Empleado>, Ser
         return Float.compare(empleado.sueldo, sueldo) == 0 &&
                 Objects.equals(fechaContratacion, empleado.fechaContratacion);
     }
-    public String toCSV(){
-        return nombre + "," + apellido + "," + codigo + "," + fechaContratacion + ",    " + sueldo;
-    }
     public static boolean haPasadoUnAño(String fechaStr) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -185,13 +191,14 @@ public class Empleado implements Comparable<Empleado>, Comparator<Empleado>, Ser
         }
     }
     
-    public float CalcularSueldoMensual() {
+    protected float CalcularSueldoMensual() {
         aporteIESS();
         fondoReserva();
         decimoTercero();
         decimoCuarto();
         float sueldoMensual = getSueldo();
-        return sueldoMensual - aporteIESS() - fondoReserva() + decimoTercero() + decimoCuarto();
+        float sueldoMensualsinRenta = sueldoMensual - aporteIESS() - fondoReserva() + decimoTercero() + decimoCuarto();
+        return sueldoMensualsinRenta;
     }
     public float aporteIESS() {
         return (float) (getSueldo() * 0.0945);
@@ -208,5 +215,36 @@ public class Empleado implements Comparable<Empleado>, Comparator<Empleado>, Ser
     }
     public float decimoCuarto(){
         return (float) (460 / 12);
+    }
+    public float impuestoRenta(){
+        float impuestoRenta = 0;
+        float ingresoAnual = CalcularSueldoMensual() * 12;
+
+        if (ingresoAnual <= 11902) {
+            impuestoRenta = 0;
+        } else if (ingresoAnual <= 15159) {
+            impuestoRenta = (ingresoAnual - 11902) * 0.05f;
+        } else if (ingresoAnual <= 19682) {
+            impuestoRenta = 163 + (ingresoAnual - 15159) * 0.1f;
+        } else if (ingresoAnual <= 26031) {
+            impuestoRenta = 615 + (ingresoAnual - 19682) * 0.12f;
+        } else if (ingresoAnual <= 34255) {
+            impuestoRenta = 1377 + (ingresoAnual - 26031) * 0.15f;
+        } else if (ingresoAnual <= 45407) {
+            impuestoRenta = 2611 + (ingresoAnual - 34255) * 0.2f;
+        } else if (ingresoAnual <= 60450) {
+            impuestoRenta = 4841 + (ingresoAnual - 45407) * 0.25f;
+        } else if (ingresoAnual <= 80605) {
+            impuestoRenta = 8602 + (ingresoAnual - 60450) * 0.3f;
+        } else if (ingresoAnual <= 107199) {
+            impuestoRenta = 14648 + (ingresoAnual - 80605) * 0.35f;
+        } else {
+            impuestoRenta = 23956 + (ingresoAnual - 107199) * 0.37f;
+        }
+
+        return impuestoRenta/12;
+    }
+    public float sueldoLiquido(){
+        return CalcularSueldoMensual() - impuestoRenta();
     }
 }
