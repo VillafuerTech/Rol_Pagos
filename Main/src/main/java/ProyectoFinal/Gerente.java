@@ -73,5 +73,5 @@ public class Gerente extends Empleado {
         float sueldoMensual = CalcularSueldoMensual();
         float sueldoLiquido = sueldoMensual + comision/12 - impuestoRenta();
         return sueldoLiquido;
-    }
+    }   
     }

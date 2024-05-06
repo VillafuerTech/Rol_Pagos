@@ -125,7 +125,43 @@ public class Empresa implements Serializable {
     }
     ordenarListas();
 }
-
+    //Un string con el rol de pago de un empleado
+    public String EmpleadoIndividual(int codigo){
+        StringBuilder sb = new StringBuilder();
+        for (Empleado e : empleados) {
+            if (e.getCodigo() == codigo) {
+                sb.append("Tipo: ").append(e.getClass().getSimpleName()).append("\n");
+                sb.append("Código: ").append(e.getCodigo()).append("\n");
+                sb.append("Nombre: ").append(e.getNombre()).append("\n");
+                sb.append("Apellido: ").append(e.getApellido()).append("\n");
+                sb.append("Fecha de contratación: ").append(e.getFechaContratacion()).append("\n");
+                sb.append("Sueldo: ").append(e.getSueldo()).append("\n");
+                sb.append("Aporte IESS: ").append(e.aporteIESS()).append("\n");
+                sb.append("Impuesto Renta: ").append(e.impuestoRenta()).append("\n");
+                sb.append("Fondo Reserva: ").append(e.fondoReserva()).append("\n");
+                sb.append("Decimo Tercero: ").append(e.decimoTercero()).append("\n");
+                sb.append("Decimo Cuarto: ").append(e.decimoCuarto()).append("\n");
+                sb.append("Sueldo Líquido: ").append(e.sueldoLiquido()).append("\n");
+                sb.append("Líquido en Palabras: ").append(NumerosATexto.numeroATexto((int) e.sueldoLiquido())).append("\n");
+            }
+        }
+        return sb.toString();
+    }   
+    public void ModificarEmpleado(int codigo, Empleado empleado){
+        for (Empleado e : empleados) {
+            if (e.getCodigo() == codigo) {
+                e.setNombre(empleado.getNombre());
+                e.setApellido(empleado.getApellido());
+                e.setCodigo(empleado.getCodigo());
+                e.setFechaContratacion(empleado.getFechaContratacion());
+                e.setSueldo(empleado.getSueldo());
+                if(e instanceof Gerente){
+                    ((Gerente) e).setTitulo(((Gerente) empleado).getTitulo());
+                }
+                break;
+            }
+        }
+    }
     public void ordenarListas() {
         Collections.sort(empleados, Empleado.compararPorApellido());
         empleadosApellido = new ArrayList<>(empleados);
@@ -174,6 +210,12 @@ public class Empresa implements Serializable {
     }
 
     public void AgregarEmpleado(Empleado empleado) {
+        //Revisar que no se repita el codigo
+        for (Empleado e : empleados) {
+            if (e.getCodigo() == empleado.getCodigo()) {
+                throw new IllegalArgumentException("El código ya existe");
+            }
+        }
         empleados.add(empleado);
         empleadosApellido.add(empleado);
         empleadosSueldo.add(empleado);
