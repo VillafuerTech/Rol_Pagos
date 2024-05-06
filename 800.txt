@@ -1,10 +1,3 @@
-Tipo: Empleado
-Código: 9101
-Nombre: María
-Apellido: Rodríguez
-Sueldo líquido: 762.4267
-Billetes de 20: 38
-Billetes de 10: 0
-Billetes de 5: 0
-Billetes de 1: 2
-
+Tipo         Código     Nombre          Apellido        Sueldo Líquido  Desglose de Billetes                              
+========================================================================================================================
+Empleado     9101       María           Rodríguez       762.43          20: 38, 10: 0, 5: 0, 1: 2                         
